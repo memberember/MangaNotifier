@@ -247,11 +247,4 @@ if __name__ == '__main__':
     urls = []
     data = []
     executor.start_polling(dp, on_shutdown=shutdown)
-    # manga_list = [
-    #               {'id': 2, 'manga_name': 'Onepunchman (Ванпанчмен)', 'last_chapter': '27 - 175',
-    #                'site_type': 'manga-chan', 'url': 'https://manga-chan.me/manga/17079-onepunchman.html'},
-    #               {'id': 15, 'manga_name': 'Милый дом', 'last_chapter': '1 - 114', 'site_type': 'readmanga',
-    #                'url': 'https://readmanga.live/sweet_home__kim_carnby_'}]
-    #
-    # print(PR.get_manga_chapters(manga_list))
-    # print(PR.test())
+
