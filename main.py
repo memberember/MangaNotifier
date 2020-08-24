@@ -226,8 +226,13 @@ def get_fast_updates(user_id):
 
 # функция турбо поиска обновлений
 def processing():
+    option = webdriver.ChromeOptions()
+    chrome_prefs = {}
+    option.experimental_options["prefs"] = chrome_prefs
+    chrome_prefs["profile.default_content_settings"] = {"images": 2}
+    chrome_prefs["profile.managed_default_content_settings"] = {"images": 2}
+    driver = webdriver.Chrome(chrome_options=option)
     global thread_list
-    driver = webdriver.Chrome()
     while len(urls) > 0:
         with lock:
             thisurl = urls.pop(-1)
