@@ -70,33 +70,36 @@ def get_manga_chapters(manga_list):
 
     updates = []
     for manga in manga_list:
-        cutter_re, chapter_xpath, last_chapter_xpath, name_xpath = get_manga_define_dataset(manga['site_type'])
-        driver.get(manga['url'])
-        new_chapters = []
-        chapters = driver.find_elements_by_xpath(chapter_xpath)
-        manga_name = driver.find_element_by_xpath(name_xpath).text
-        last_chapter = re.search(cutter_re,
-                                 driver.find_element_by_xpath(
-                                     last_chapter_xpath)
-                                 .text)[0]
-        for chapter in chapters:
+        try:
+            cutter_re, chapter_xpath, last_chapter_xpath, name_xpath = get_manga_define_dataset(manga['site_type'])
+            driver.get(manga['url'])
+            new_chapters = []
+            chapters = driver.find_elements_by_xpath(chapter_xpath)
+            manga_name = driver.find_element_by_xpath(name_xpath).text
+            last_chapter = re.search(cutter_re,
+                                     driver.find_element_by_xpath(
+                                         last_chapter_xpath)
+                                     .text)[0]
+            for chapter in chapters:
 
-            chapter_num = re.search(cutter_re,
-                                    chapter.text)[0]
+                chapter_num = re.search(cutter_re,
+                                        chapter.text)[0]
 
-            chapter_url = chapter.find_element_by_tag_name('a').get_attribute('href')
-            new_chapter = CV.text_to_date_and_chapter_url_dict(chapter.text, chapter_url)
+                chapter_url = chapter.find_element_by_tag_name('a').get_attribute('href')
+                new_chapter = CV.text_to_date_and_chapter_url_dict(chapter.text, chapter_url)
 
-            if (chapter_num == manga['last_chapter']):
-                updates.append({
-                    'manga_name': manga_name,
-                    'last_chapter': last_chapter,
-                    'new_chapters': new_chapters,
-                    'id': manga['id']
-                }
-                )
-                break
-            new_chapters.append(new_chapter)
+                if (chapter_num == manga['last_chapter']):
+                    updates.append({
+                        'manga_name': manga_name,
+                        'last_chapter': last_chapter,
+                        'new_chapters': new_chapters,
+                        'id': manga['id']
+                    }
+                    )
+                    break
+                new_chapters.append(new_chapter)
+        except:
+            pass
     driver.close()
     return updates
 
