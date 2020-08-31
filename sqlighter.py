@@ -23,7 +23,6 @@ class SQLighter:
         """Проверяем мангу пользователя"""
         with self.connection:
             result = self.cursor.execute("SELECT * FROM `manga_title` WHERE `user_id` = ?", (user_id,)).fetchall()
-
             return result
 
     def update_manga(self, user_id, id, last_chapter):
