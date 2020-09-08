@@ -37,7 +37,6 @@ def get_manga_information(target_url):
 
 
 # функция возвращения паттерна парсинга
-# todo добавить mintmanga
 def get_url_pattern(target_url):
     try:
         if target_url.__contains__('readmanga') or target_url.__contains__('mintmanga'):
@@ -50,17 +49,19 @@ def get_url_pattern(target_url):
         return 0
 
 
-# todo оптимизировать
 # функция получения набора данных для парсинга сайта
 def get_manga_define_dataset(site_type):
     if site_type == 'manga-chan':
-        return P.chapter_number_re, P.mangachan_chapter_xpath, P.mangachan_last_chapter_xpath, P.mangachan_name_xpath
+        return P.Mangachan
     elif site_type == 'readmanga' or site_type == 'mintmanga':
-        return P.chapter_number_re, P.readmanga_chapter_xpath, P.readmanga_last_chapter_xpath, P.readmanga_name_xpath
+        return P.Readmanga
 
 
+# todo может получится ускорить поиск глав без выкачивания полного списка или при помощи IE
 # функция получения последних глав по манге
 def get_manga_chapters(manga_list):
+
+    # инициализируем опции хрома (отключаем подгрузку изображений)
     option = webdriver.ChromeOptions()
     chrome_prefs = {}
     option.experimental_options["prefs"] = chrome_prefs
@@ -68,18 +69,35 @@ def get_manga_chapters(manga_list):
     chrome_prefs["profile.managed_default_content_settings"] = {"images": 2}
     driver = webdriver.Chrome(chrome_options=option)
 
+    # создаем пустой массив обновлений
     updates = []
+
+    # цикл для прогонки большого количества манги
     for manga in manga_list:
+
+        # обработчик ошибок
         try:
-            cutter_re, chapter_xpath, last_chapter_xpath, name_xpath = get_manga_define_dataset(manga['site_type'])
+
+            # получаем шаблоны по которым будем парсить данные
+            cutter_re = P.chapter_number_re
+            this_manga_pattern = get_manga_define_dataset(manga['site_type'])
+            chapter_xpath = this_manga_pattern['chapter_xpath']
+            last_chapter_xpath = this_manga_pattern['last_chapter_xpath']
+            name_xpath = this_manga_pattern['name_xpath']
+
+            # открываем ссылку и создаем пустой массив с новыми главами
             driver.get(manga['url'])
             new_chapters = []
+
+            # процесс парсинга
             chapters = driver.find_elements_by_xpath(chapter_xpath)
             manga_name = driver.find_element_by_xpath(name_xpath).text
             last_chapter = re.search(cutter_re,
                                      driver.find_element_by_xpath(
                                          last_chapter_xpath)
                                      .text)[0]
+
+            # процесс проверки глав на новизну
             for chapter in chapters:
 
                 chapter_num = re.search(cutter_re,
@@ -88,6 +106,7 @@ def get_manga_chapters(manga_list):
                 chapter_url = chapter.find_element_by_tag_name('a').get_attribute('href')
                 new_chapter = CV.text_to_date_and_chapter_url_dict(chapter.text, chapter_url)
 
+                # если дошли до главы которую мы читали последней выходим из цикла и добавляем записи в обновления
                 if (chapter_num == manga['last_chapter']):
                     updates.append({
                         'manga_name': manga_name,
@@ -97,16 +116,24 @@ def get_manga_chapters(manga_list):
                     }
                     )
                     break
+
+                # иначе, если главу не читали, то добавляем ее как новую главу
                 new_chapters.append(new_chapter)
         except:
             pass
+
+    # закрытие браузера
     driver.close()
     return updates
 
 
 # функция получения последних глав по манге (турбо режим)
-def get_manga_updates(manga, driver):
-    cutter_re, chapter_xpath, last_chapter_xpath, name_xpath = get_manga_define_dataset(manga['site_type'])
+def get_manga_updates_turbo(manga, driver):
+    cutter_re = P.chapter_number_re
+    this_manga_pattern = get_manga_define_dataset(manga['site_type'])
+    chapter_xpath = this_manga_pattern['chapter_xpath']
+    last_chapter_xpath = this_manga_pattern['last_chapter_xpath']
+    name_xpath = this_manga_pattern['name_xpath']
     driver.get(manga['url'])
     new_chapters = []
     chapters = driver.find_elements_by_xpath(chapter_xpath)
