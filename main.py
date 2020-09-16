@@ -69,8 +69,7 @@ async def refresh(message: types.Message):
     else:
         await message.answer(MESSAGES['search_is_started'])
         updates = get_updates(message.from_user.id)
-    await message.answer(updates)
-    await message.answer("Поиск занял %s секунд" % (time.time() - start_time))
+    await message.answer(updates+"\nПоиск занял %s секунд" % (time.time() - start_time))
 
 
 # обработчик команды удаления тайтла
