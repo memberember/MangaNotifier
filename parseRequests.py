@@ -14,8 +14,8 @@ def get_manga_information(target_url):
         last_chapter_xpath = pattern['last_chapter_xpath']
         url_xpath = pattern['last_manga_url_xpath']
         site_type = target_url.split('/')[2].split('.')[0]
-    finally:
-        return 0
+    except:
+        pass
     try:
 
         driver = webdriver.Chrome()
@@ -31,7 +31,7 @@ def get_manga_information(target_url):
                 'last_chapter': last_chapter,
                 'chapter_url': chapter_url,
                 'site_type': site_type}
-    finally:
+    except:
         driver.quit()
         return 0
 
@@ -45,7 +45,7 @@ def get_url_pattern(target_url):
             return P.Mangachan
         else:
             return 0
-    finally:
+    except:
         return 0
 
 
@@ -60,7 +60,6 @@ def get_manga_define_dataset(site_type):
 # todo может получится ускорить поиск глав без выкачивания полного списка или при помощи IE
 # функция получения последних глав по манге
 def get_manga_chapters(manga_list):
-
     # инициализируем опции хрома (отключаем подгрузку изображений)
     option = webdriver.ChromeOptions()
     chrome_prefs = {}
@@ -100,14 +99,31 @@ def get_manga_chapters(manga_list):
             # процесс проверки глав на новизну
             for chapter in chapters:
 
-                chapter_num = re.search(cutter_re,
-                                        chapter.text)[0]
+                # TODO баг в манге Герой? Я давно перестал им быть на главе 1-117 когда за день вышло больше 30 глав
+                # todo исправить кастыль в виде try except
+                try:
+                    chapter_num = re.search(cutter_re,
+                                            chapter.text)[1]
+                    chapter_url = chapter.find_element_by_tag_name('a').get_attribute('href')
+                    new_chapter = CV.text_to_date_and_chapter_url_dict(chapter.text, chapter_url)
 
-                chapter_url = chapter.find_element_by_tag_name('a').get_attribute('href')
-                new_chapter = CV.text_to_date_and_chapter_url_dict(chapter.text, chapter_url)
+                    # если дошли до главы которую мы читали последней выходим из цикла и добавляем записи в обновления
+                    if (chapter_num == manga['last_chapter']):
+                        updates.append({
+                            'manga_name': manga_name,
+                            'last_chapter': last_chapter,
+                            'new_chapters': new_chapters,
+                            'id': manga['id']
+                        }
+                        )
+                        break
 
-                # если дошли до главы которую мы читали последней выходим из цикла и добавляем записи в обновления
-                if (chapter_num == manga['last_chapter']):
+                    # иначе, если главу не читали, то добавляем ее как новую главу
+                    new_chapters.append(new_chapter)
+
+                except:
+
+                    # TODO исправить костыль для бага с мангой 30+
                     updates.append({
                         'manga_name': manga_name,
                         'last_chapter': last_chapter,
@@ -116,10 +132,7 @@ def get_manga_chapters(manga_list):
                     }
                     )
                     break
-
-                # иначе, если главу не читали, то добавляем ее как новую главу
-                new_chapters.append(new_chapter)
-        finally:
+        except:
             pass
 
     # закрытие браузера
@@ -179,5 +192,5 @@ def test():
         new_chapter = CV.text_to_date_and_chapter_url_dict(chapters[0].text, chapter_url)
         print(new_chapter)
         driver.quit()
-    finally:
+    except:
         driver.quit()

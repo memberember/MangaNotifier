@@ -10,6 +10,7 @@ from messages import MESSAGES
 import parseRequests as PR
 import converter as CV
 from selenium import webdriver
+import bugtracker as BUGS
 
 # задаем уровень логов
 logging.basicConfig(level=logging.INFO)
@@ -69,7 +70,7 @@ async def refresh(message: types.Message):
     else:
         await message.answer(MESSAGES['search_is_started'])
         updates = get_updates(message.from_user.id)
-    await message.answer(updates+"\nПоиск занял %s секунд" % (time.time() - start_time))
+    await message.answer(updates + "\nПоиск занял %s секунд" % (time.time() - start_time))
 
 
 # обработчик команды удаления тайтла
