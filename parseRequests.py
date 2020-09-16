@@ -14,7 +14,7 @@ def get_manga_information(target_url):
         last_chapter_xpath = pattern['last_chapter_xpath']
         url_xpath = pattern['last_manga_url_xpath']
         site_type = target_url.split('/')[2].split('.')[0]
-    except:
+    finally:
         return 0
     try:
 
@@ -26,13 +26,13 @@ def get_manga_information(target_url):
                                      last_chapter_xpath)
                                  .text)[0]
         chapter_url = driver.find_element_by_xpath(url_xpath).get_attribute('href')
-        driver.close()
+        driver.quit()
         return {'manga_name': manga_name,
                 'last_chapter': last_chapter,
                 'chapter_url': chapter_url,
                 'site_type': site_type}
-    except:
-        driver.close()
+    finally:
+        driver.quit()
         return 0
 
 
@@ -45,7 +45,7 @@ def get_url_pattern(target_url):
             return P.Mangachan
         else:
             return 0
-    except:
+    finally:
         return 0
 
 
@@ -119,11 +119,11 @@ def get_manga_chapters(manga_list):
 
                 # иначе, если главу не читали, то добавляем ее как новую главу
                 new_chapters.append(new_chapter)
-        except:
+        finally:
             pass
 
     # закрытие браузера
-    driver.close()
+    driver.quit()
     return updates
 
 
@@ -178,6 +178,6 @@ def test():
         chapter_url = chapters[0].find_element_by_tag_name('a').get_attribute('href')
         new_chapter = CV.text_to_date_and_chapter_url_dict(chapters[0].text, chapter_url)
         print(new_chapter)
-        driver.close()
-    except:
-        driver.close()
+        driver.quit()
+    finally:
+        driver.quit()

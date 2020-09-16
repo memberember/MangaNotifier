@@ -1,4 +1,3 @@
-
 """Регулярки"""
 chapter_number_re = '((?:\d){1,3}\s-\s(?:\d){1,4})'
 chapter_date_re = '((?:\d){1,4}[-.](?:\d){2}[-.](?:\d){2})'
@@ -15,6 +14,9 @@ mangachan_last_manga_url_xpath = '//tbody/tr[*]/td[1]/div/a'
 mangachan_name_xpath = '//*[@id="info_wrap"]/div/div/h1/a'
 mangachan_chapter_xpath = '//*[@id="tc_1"]/tbody/tr[*]/td[1]/div/a/../../..'
 mangachan_date_xpath = '//*[@id="tc_1"]/tbody/tr[*]/td[2]/div'
+
+# todo добавить css селекторы чтобы ускорить поиск
+
 
 Readmanga = {
     'chapter_cutter_re': chapter_number_re,
