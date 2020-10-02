@@ -217,7 +217,6 @@ def get_short_updates(user_id):
     list_from_db = get_manga_list_from_db(user_id)
     updates = PR.get_manga_list_last_chapters(list_from_db)
     update_db(user_id, updates)
-    print(updates)
     return CV.from_short_updated_manga_list_to_str(updates)
 
 
