@@ -16,8 +16,8 @@ import bugtracker as BUGS
 logging.basicConfig(level=logging.INFO)
 
 # инициализируем бота
-# bot = Bot(token=config.MANGA_API_TOKEN)
-bot = Bot(token=config.TEST_API_TOKEN)
+bot = Bot(token=config.MANGA_API_TOKEN)
+# bot = Bot(token=config.TEST_API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 # todo попробовать сделать бд на сервере
