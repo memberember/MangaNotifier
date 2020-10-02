@@ -20,6 +20,8 @@ manga_sucsesfully_added_message = 'Манга {}[{}] успешно добавл
 dont_have_such_manga_message = 'У вас нет манги с id = {}'
 search_is_started_message = 'Я началь искать...'
 fast_search_is_started_message = 'Включаю турбо поиск'
+detailed_search_is_started_message = 'Включаю детальный поиск'
+
 you_already_have_this_manga = 'У вас уже есть эта манга - {}'
 MESSAGES = {
     'start': start_message,
@@ -34,6 +36,7 @@ MESSAGES = {
     'dont_have_such_manga': dont_have_such_manga_message,
     'search_is_started': search_is_started_message,
     'fast_search_is_started': fast_search_is_started_message,
+    'detailed_search_is_started': detailed_search_is_started_message,
     'data_error': data_error_message,
     'you_already_have_this_manga': you_already_have_this_manga
 }

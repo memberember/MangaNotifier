@@ -140,6 +140,57 @@ def get_manga_chapters(manga_list):
     return updates
 
 
+# функция получения последних глав по манге
+def get_manga_list_last_chapters(manga_list):
+    # инициализируем опции хрома (отключаем подгрузку изображений)
+    option = webdriver.ChromeOptions()
+    chrome_prefs = {}
+    option.experimental_options["prefs"] = chrome_prefs
+    chrome_prefs["profile.default_content_settings"] = {"images": 2}
+    chrome_prefs["profile.managed_default_content_settings"] = {"images": 2}
+    driver = webdriver.Chrome(chrome_options=option)
+
+    # создаем пустой массив обновлений
+    updates = []
+
+    # цикл для прогонки большого количества манги
+    for manga in manga_list:
+
+        # обработчик ошибок
+        try:
+
+            # получаем шаблоны по которым будем парсить данные
+            cutter_re = P.chapter_number_re
+            this_manga_pattern = get_manga_define_dataset(manga['site_type'])
+            last_chapter_xpath = this_manga_pattern['last_chapter_xpath']
+            name_xpath = this_manga_pattern['name_xpath']
+
+            driver.get(manga['url'])
+            manga_name = driver.find_element_by_xpath(name_xpath).text
+            last_chapter = re.search(cutter_re,
+                                     driver.find_element_by_xpath(
+                                         last_chapter_xpath)
+                                     .text)[0]
+
+            if (manga['last_chapter'] != last_chapter):
+                updates.append({
+                    'manga_name': manga_name,
+                    'last_chapter': last_chapter,
+                    'id': manga['id'],
+                    'url': manga['url'],
+                    'prev_chapter': manga['last_chapter']
+                }
+                )
+
+        except:
+            pass
+
+    # закрытие браузера
+    driver.quit()
+    return updates
+
+
+# todo поставить try catch и проверить
 # функция получения последних глав по манге (турбо режим)
 def get_manga_updates_turbo(manga, driver):
     cutter_re = P.chapter_number_re

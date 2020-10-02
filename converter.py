@@ -26,6 +26,20 @@ def from_updated_manga_list_to_str(updates):
     return message
 
 
+def from_short_updated_manga_list_to_str(updates):
+    message = 'Нет обновлений\n'
+    if len(updates)>0:
+        message = 'Вышли новые главы:\n'
+        for update in updates:
+            print(update['manga_name'])
+            message += '{} {}\t->\t{} \t{}\n'.format(update['manga_name'],
+                                                     update['prev_chapter'],
+                                                     update['last_chapter'],
+                                                     update['url'])
+            message += '\n'
+    return message
+
+
 def text_to_splitted(text):
     first_step = text.split('\n')
     second_step = []

@@ -16,8 +16,8 @@ import bugtracker as BUGS
 logging.basicConfig(level=logging.INFO)
 
 # инициализируем бота
-bot = Bot(token=config.MANGA_API_TOKEN)
-# bot = Bot(token=config.TEST_API_TOKEN)
+# bot = Bot(token=config.MANGA_API_TOKEN)
+bot = Bot(token=config.TEST_API_TOKEN)
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 # todo попробовать сделать бд на сервере
@@ -67,9 +67,12 @@ async def refresh(message: types.Message):
         await message.answer(MESSAGES['fast_search_is_started'])
         urls = get_manga_list_from_db(507981523)
         updates = get_fast_updates(message.from_user.id)
+    if argument.lower() == 'd' and message.from_user.id == 507981523:
+        await message.answer(MESSAGES['detailed_search_is_started'])
+        updates = get_updates(message.from_user.id)
     else:
         await message.answer(MESSAGES['search_is_started'])
-        updates = get_updates(message.from_user.id)
+        updates = get_short_updates(message.from_user.id)
     await message.answer(updates + "\nПоиск занял %s секунд" % (time.time() - start_time))
 
 
@@ -207,6 +210,15 @@ def get_updates(user_id):
     updates = PR.get_manga_chapters(list_from_db)
     update_db(user_id, updates)
     return CV.from_updated_manga_list_to_str(updates)
+
+
+# короткие обновления
+def get_short_updates(user_id):
+    list_from_db = get_manga_list_from_db(user_id)
+    updates = PR.get_manga_list_last_chapters(list_from_db)
+    update_db(user_id, updates)
+    print(updates)
+    return CV.from_short_updated_manga_list_to_str(updates)
 
 
 # турбо обновления
