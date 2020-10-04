@@ -140,8 +140,9 @@ def get_manga_chapters(manga_list):
     return updates
 
 
-# функция получения последних глав по манге
+# функция получения последней главы по манге
 def get_manga_list_last_chapters(manga_list):
+
     # инициализируем опции хрома (отключаем подгрузку изображений)
     option = webdriver.ChromeOptions()
     chrome_prefs = {}

@@ -4,7 +4,7 @@ chapter_date_re = '((?:\d){1,4}[-.](?:\d){2}[-.](?:\d){2})'
 
 """XPATH"""
 readmanga_last_chapter_xpath = '//*[@id="mangaBox"]/div[2]/div[1]/div[1]/div[*]/h4/a'
-readmanga_last_manga_url_xpath = '/html/body/div[4]/div[2]/div[*]/table/tbody/tr[1]/td[1]/a'
+readmanga_last_manga_url_xpath = '//div[*]/table/tbody/tr[1]/td[1]/a'
 readmanga_name_xpath = '//*[@id="mangaBox"]/div[2]/h1/span'
 readmanga_chapter_xpath = '//*[@id="mangaBox"]/div[2]/div[*]/table/tbody/tr[*]'
 readmanga_date_xpath = '//*[@id="mangaBox"]/div[2]/div[*]/table/tbody/tr[*]/td[2]'
