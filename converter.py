@@ -1,5 +1,5 @@
 import re
-import patterns as P
+import pages.locators as P
 
 
 def from_manga_list_dict_to_manga_str(manga_dict):
@@ -7,36 +7,21 @@ def from_manga_list_dict_to_manga_str(manga_dict):
     for manga in manga_dict:
         manga_list_string += '[{}] {} {} {}\n'.format(manga['id']
                                                       , manga['manga_name']
-                                                      , manga['last_chapter']
-                                                      , manga['site_type'])
+                                                      , manga['last_chapter'])
     return manga_list_string
 
 
-def from_updated_manga_list_to_str(updates):
-    message = 'Нет обновлений\n'
-    for update in updates:
-        if update != None:
-            if len(update['new_chapters']) > 0:
-                if message == 'Нет обновлений\n':
-                    message = 'Вышли новые главы:'
-                message += '{}\n'.format(update['manga_name'])
-                for chapter in update['new_chapters']:
-                    message += '{} {}\n'.format(chapter['url'], chapter['date'])
-                message += '\n'
-    return message
-
-
 def from_short_updated_manga_list_to_str(updates):
-    message = 'Нет обновлений\n'
-    if len(updates)>0:
-        message = 'Вышли новые главы:\n'
+
+    # todo сделать выдачу пакетами
+    message = ['Нет обновлений']
+    if len(updates) > 0:
+        message[0] = 'Вышли новые главы:\n'
         for update in updates:
-            print(update['manga_name'])
-            message += '{} {}\t->\t{} \t{}\n'.format(update['manga_name'],
+            message.append('{} {}\t->\t{} \t{}'.format(update['manga_name'],
                                                      update['prev_chapter'],
                                                      update['last_chapter'],
-                                                     update['url'])
-            message += '\n'
+                                                     update['url']))
     return message
 
 

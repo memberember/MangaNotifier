@@ -1,7 +1,7 @@
 from aiogram.utils.helper import Helper, HelperMode, ListItem
 
 
-class TestStates(Helper):
+class BotStates(Helper):
     mode = HelperMode.snake_case
 
     MANGA_ADDITION_STATE = ListItem()

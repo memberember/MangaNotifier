@@ -5,12 +5,10 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram import Bot, Dispatcher, executor, types
 import config
 import logging
-from utils import TestStates
+from utils import BotStates
 from messages import MESSAGES
-import parseRequests as PR
 import converter as CV
-from selenium import webdriver
-import bugtracker as BUGS
+import parseRequests as PR
 
 # задаем уровень логов
 logging.basicConfig(level=logging.INFO)
@@ -42,7 +40,7 @@ async def process_help_command(message: types.Message):
 async def process_add_url(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     await message.answer(MESSAGES['write_url'])
-    await state.set_state(TestStates.all()[0])
+    await state.set_state(BotStates.all()[0])
 
 
 # обработчик команды вывода списка моих тайтлов
@@ -58,22 +56,20 @@ async def get_subcribed(message: types.Message):
 # обработчик команды обновления
 @dp.message_handler(state='*', commands=['refresh'])
 async def refresh(message: types.Message):
-    global urls
+    global global_manga_list
     argument = message.get_args()
     start_time = time.time()
 
     # турбо поиск по команде /refresh t
-    if argument.lower() == 't' and message.from_user.id == 507981523:
+    if argument.lower() == 't' and message.from_user.id == config.ADMIN_USER_ID:
         await message.answer(MESSAGES['fast_search_is_started'])
-        urls = get_manga_list_from_db(507981523)
         updates = get_fast_updates(message.from_user.id)
-    if argument.lower() == 'd' and message.from_user.id == 507981523:
-        await message.answer(MESSAGES['detailed_search_is_started'])
-        updates = get_updates(message.from_user.id)
     else:
         await message.answer(MESSAGES['search_is_started'])
-        updates = get_short_updates(message.from_user.id)
-    await message.answer(updates + "\nПоиск занял %s секунд" % (time.time() - start_time))
+        updates = get_updates(message.from_user.id)
+    for update in updates:
+        await message.answer(update)
+    await message.answer("\nПоиск занял %s секунд" % (time.time() - start_time))
 
 
 # обработчик команды удаления тайтла
@@ -81,11 +77,11 @@ async def refresh(message: types.Message):
 async def refresh(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
     await message.answer(MESSAGES['write_manga_id_to_delete'])
-    await state.set_state(TestStates.all()[1])
+    await state.set_state(BotStates.all()[1])
 
 
 # обработчик добавления ссылки на мангу
-@dp.message_handler(state=TestStates.MANGA_ADDITION_STATE)
+@dp.message_handler(state=BotStates.MANGA_ADDITION_STATE)
 async def manga_addition_handler(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
@@ -104,12 +100,13 @@ async def manga_addition_handler(message: types.Message):
         await state.reset_state()
 
         # сообщение об ошибке
-    except:
-        await message.answer(MESSAGES['error_try_again'])
+    finally:
+        pass
+        # await message.answer(MESSAGES['error_try_again'])
 
 
 # обработчик удаления манги
-@dp.message_handler(state=TestStates.MANGA_DELETE_STATE)
+@dp.message_handler(state=BotStates.MANGA_DELETE_STATE)
 async def manga_delete_handler(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
 
@@ -146,8 +143,8 @@ def add_manga(user_id, url):
     if not is_user_have_manga_by_url:
 
         # получение информации о манге
-        manga = PR.get_manga_information(url)
-
+        manga = PR.get_manga(url)
+        print(manga)
         # проверка спарсилась ли манга
         if manga != 0:
             db.add_manga(
@@ -155,9 +152,8 @@ def add_manga(user_id, url):
                 url=url,
                 last_chapter=manga['last_chapter'],
                 name=manga['manga_name'],
-                site_type=manga['site_type'],
             )
-            return MESSAGES['manga_sucsesfully_added'].format(manga['manga_name'], manga['site_type'])
+            return MESSAGES['manga_sucsesfully_added'].format(manga['manga_name'])
         return MESSAGES['data_error'].format(url)
     return MESSAGES['you_already_have_this_manga'].format(url)
 
@@ -180,19 +176,9 @@ def get_manga_list_from_db(user_id):
             'id': title[0],
             'manga_name': title[4],
             'last_chapter': title[3],
-            'site_type': title[5],
             'url': title[2]
         })
     return manga_list
-
-
-# команда получения url списка манги из БД
-# def get_manga_urls_from_db(user_id):
-#     manga = db.get_manga(user_id)
-#     manga_urls = []
-#     for title in manga:
-#         manga_urls.append(title[2])
-#     return manga_urls
 
 
 # функция обновления базы данных на новые данные
@@ -204,17 +190,10 @@ def update_db(user_id, manga_list):
                             last_chapter=manga['last_chapter'])
 
 
-# функция получения обновлений манги
+# короткие обновления
 def get_updates(user_id):
     list_from_db = get_manga_list_from_db(user_id)
-    updates = PR.get_manga_chapters(list_from_db)
-    update_db(user_id, updates)
-    return CV.from_updated_manga_list_to_str(updates)
 
-
-# короткие обновления
-def get_short_updates(user_id):
-    list_from_db = get_manga_list_from_db(user_id)
     updates = PR.get_manga_list_last_chapters(list_from_db)
     update_db(user_id, updates)
     return CV.from_short_updated_manga_list_to_str(updates)
@@ -222,35 +201,45 @@ def get_short_updates(user_id):
 
 # турбо обновления
 def get_fast_updates(user_id):
-    global urls
+
+    # объявление глобальных переменных
+    global global_manga_list
     global thread_list
+    global data
+
+    # очистка глобальных переменных
+    global_manga_list = get_manga_list_from_db(user_id)
     thread_list = []
-    for i in range(4):
+    data = []
+
+    # распределение потоков
+    for i in range(10):
         thread_b = threading.Thread(target=processing)
         thread_list.append(thread_b)
         thread_b.start()
     while len(thread_list) > 0:
         time.sleep(1)
     update_db(user_id, data)
-    return CV.from_updated_manga_list_to_str(data)
+    return CV.from_short_updated_manga_list_to_str(data)
 
 
 # функция турбо поиска обновлений
 def processing():
-    option = webdriver.ChromeOptions()
-    chrome_prefs = {}
-    option.experimental_options["prefs"] = chrome_prefs
-    chrome_prefs["profile.default_content_settings"] = {"images": 2}
-    chrome_prefs["profile.managed_default_content_settings"] = {"images": 2}
-    driver = webdriver.Chrome(chrome_options=option)
     global thread_list
-    while len(urls) > 0:
+    global data
+    while len(global_manga_list) > 0:
         with lock:
-            thisurl = urls.pop(-1)
-        s = PR.get_manga_updates_turbo(thisurl, driver)
-        with lock:
-            data.append(s)
-    driver.close()
+            manga = global_manga_list.pop(-1)
+        s = PR.get_manga_updates_turbo(manga)
+        if s != 0:
+            with lock:
+                data.append({
+                    'manga_name': s["manga_name"],
+                    'last_chapter': s["last_chapter"],
+                    'id': manga['id'],
+                    'url': manga['url'],
+                    'prev_chapter': manga['last_chapter']
+                })
     with lock:
         thread_list.pop(-1)
 
@@ -260,7 +249,6 @@ if __name__ == '__main__':
     # dp.loop.create_task(scheduled(10))  # пока что оставим 10 секунд (в качестве теста)
     lock = threading.Lock()
     thread_list = []
-    urls = []
+    global_manga_list = []
     data = []
     executor.start_polling(dp, on_shutdown=shutdown)
-

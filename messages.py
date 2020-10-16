@@ -1,5 +1,6 @@
-from utils import TestStates
+from utils import BotStates
 
+# todo переделать в класс
 help_message = 'Мои команды такие:\n' \
                '➕/add - добавляет новую мангу по ссылке в твой список\n' \
                '❌/delete - удаляет мангу по айди из твоего списка\n' \
@@ -16,7 +17,7 @@ data_error_message = 'Ошибка, проверьте правильность 
 write_manga_id_to_delete_message = 'Введите id манги которую хотите удалить или /cancel чтобы отменить'
 sucsessfully_deleted_message = 'Манга с id = {} успешно удалена'
 canceled_message = 'Отменено'
-manga_sucsesfully_added_message = 'Манга {}[{}] успешно добавлена!'
+manga_sucsesfully_added_message = 'Манга {} успешно добавлена!'
 dont_have_such_manga_message = 'У вас нет манги с id = {}'
 search_is_started_message = 'Я началь искать...'
 fast_search_is_started_message = 'Включаю турбо поиск'

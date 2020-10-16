@@ -11,13 +11,12 @@ class SQLighter:
 
     def add_manga(self, user_id, url,
                   last_chapter='0',
-                  name='Без имени',
-                  site_type='UK'):
+                  name='Без имени'):
         """Добавляем новую мангу"""
         with self.connection:
             return self.cursor.execute(
-                "INSERT INTO `manga_title` (`user_id`,`url`, `last_chapter`,`name`,`site_type`) VALUES(?,?,?,?,?)",
-                (user_id, url, last_chapter, name, site_type))
+                "INSERT INTO `manga_title` (`user_id`,`url`, `last_chapter`,`name`) VALUES(?,?,?,?)",
+                (user_id, url, last_chapter, name))
 
     def get_manga(self, user_id):
         """Проверяем мангу пользователя"""
