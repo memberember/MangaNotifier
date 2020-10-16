@@ -15,8 +15,10 @@ logging.basicConfig(level=logging.INFO)
 
 # инициализируем бота
 bot = Bot(token=config.MANGA_API_TOKEN)
-# bot = Bot(token=config.TEST_API_TOKEN)
+ADMIN_USER_ID = config.ADMIN_USER_ID
+
 dp = Dispatcher(bot, storage=MemoryStorage())
+
 
 # todo попробовать сделать бд на сервере
 # инициализируем соединение с БД
@@ -61,7 +63,7 @@ async def refresh(message: types.Message):
     start_time = time.time()
 
     # турбо поиск по команде /refresh t
-    if argument.lower() == 't' and message.from_user.id == config.ADMIN_USER_ID:
+    if argument.lower() == 't' and message.from_user.id == ADMIN_USER_ID:
         await message.answer(MESSAGES['fast_search_is_started'])
         updates = get_fast_updates(message.from_user.id)
     else:
