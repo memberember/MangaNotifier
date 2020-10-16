@@ -17,16 +17,6 @@ def get_manga(url):
         return 0
 
 
-# получить данные по манге (при добавлении)
-def get_manga_for_url_list(url_list):
-    information = []
-    for url in url_list:
-        manga = get_manga(url)
-        if manga != 0:
-            information.append(manga)
-    return information
-
-
 # функция получения последней главы по манге
 def get_manga_list_last_chapters(manga_list):
     # создаем пустой массив обновлений
