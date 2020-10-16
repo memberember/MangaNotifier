@@ -5,7 +5,7 @@ import pages.locators as P
 def from_manga_list_dict_to_manga_str(manga_dict):
     manga_list_string = ''
     for manga in manga_dict:
-        manga_list_string += '[{}] {} {} {}\n'.format(manga['id']
+        manga_list_string += '[{}] {} {}\n'.format(manga['id']
                                                       , manga['manga_name']
                                                       , manga['last_chapter'])
     return manga_list_string
