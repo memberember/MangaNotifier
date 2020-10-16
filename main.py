@@ -19,7 +19,6 @@ ADMIN_USER_ID = config.ADMIN_USER_ID
 
 dp = Dispatcher(bot, storage=MemoryStorage())
 
-
 # todo попробовать сделать бд на сервере
 # инициализируем соединение с БД
 db = SQLighter('dborig.db')
@@ -203,7 +202,6 @@ def get_updates(user_id):
 
 # турбо обновления
 def get_fast_updates(user_id):
-
     # объявление глобальных переменных
     global global_manga_list
     global thread_list
@@ -233,6 +231,8 @@ def processing():
         with lock:
             manga = global_manga_list.pop(-1)
         s = PR.get_manga_updates_turbo(manga)
+
+        # проверка на пустоту ответа
         if s != 0:
             with lock:
                 data.append({

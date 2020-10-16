@@ -1,6 +1,7 @@
 from pages.mangaPage import MangaPage
 
 
+# функция получения информации по манге
 def get_manga(url):
 
     try:
@@ -17,8 +18,9 @@ def get_manga(url):
         return 0
 
 
-# функция получения последней главы по манге
+# функция получения последних глав по списку манги
 def get_manga_list_last_chapters(manga_list):
+    # todo допилить сделав подфункцию и избежать повторения кода как в get_manga_updates_turbo
     # создаем пустой массив обновлений
     updates = []
 
@@ -41,6 +43,7 @@ def get_manga_list_last_chapters(manga_list):
     return updates
 
 
+# функция турбо обновлений
 def get_manga_updates_turbo(current):
     from_site = get_manga(current['url'])
 
