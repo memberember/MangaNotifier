@@ -50,7 +50,7 @@ async def get_subcribed(message: types.Message):
     try:
         manga_list = get_manga_list_from_db(message.from_user.id)
         await message.answer(CV.from_manga_list_dict_to_manga_str(manga_dict=manga_list))
-    finally:
+    except:
         await message.answer(MESSAGES['empty_manga_list'])
 
 
@@ -101,9 +101,8 @@ async def manga_addition_handler(message: types.Message):
         await state.reset_state()
 
         # сообщение об ошибке
-    finally:
-        pass
-        # await message.answer(MESSAGES['error_try_again'])
+    except:
+        await message.answer(MESSAGES['error_try_again'])
 
 
 # обработчик удаления манги
