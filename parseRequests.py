@@ -20,7 +20,6 @@ def get_manga(url):
 
 # функция получения последних глав по списку манги
 def get_manga_list_last_chapters(manga_list):
-    # todo допилить сделав подфункцию и избежать повторения кода как в get_manga_updates_turbo
     # создаем пустой массив обновлений
     updates = []
 

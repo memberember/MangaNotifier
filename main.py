@@ -62,7 +62,7 @@ async def refresh(message: types.Message):
     start_time = time.time()
 
     # турбо поиск по команде /refresh t
-    if argument.lower() == 't' and message.from_user.id == ADMIN_USER_ID:
+    if argument.lower() == 't' or message.from_user.id == ADMIN_USER_ID:
         await message.answer(MESSAGES['fast_search_is_started'])
         updates = get_fast_updates(message.from_user.id)
     else:
