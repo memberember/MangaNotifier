@@ -42,11 +42,11 @@ class SQLighter:
             return bool(len(self.cursor.execute("SELECT * FROM `manga_title` WHERE (`user_id` = ?) AND (`url` = ?)",
                                                 (user_id, url)).fetchall()))
 
-    def is_user_have_manga_by_id(self, user_id, id):
+    def get_manga_by_id(self, user_id, id):
         """Проверяем наличие манги у пользователя"""
         with self.connection:
-            return bool(len(self.cursor.execute("SELECT * FROM `manga_title` WHERE (`user_id` = ?) AND (`id` = ?)",
-                                                (user_id, id)).fetchall()))
+            return self.cursor.execute("SELECT * FROM `manga_title` WHERE (`user_id` = ?) AND (`id` = ?)",
+                                       (user_id, id)).fetchall()[0]
 
     def close(self):
         """Закрываем соединение с БД"""

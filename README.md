@@ -10,6 +10,8 @@ Sites that are supported:
 
 * readmanga.live
 
+* manhwatop.com
+
 ### Important information
 
 To start the bot, you need to create a config.py file in root directory with the following fields

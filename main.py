@@ -144,7 +144,6 @@ def add_manga(user_id, url):
 
         # получение информации о манге
         manga = PR.get_manga(url)
-        print(manga)
         # проверка спарсилась ли манга
         if manga != 0:
             db.add_manga(
@@ -160,9 +159,10 @@ def add_manga(user_id, url):
 
 # функция удаления манги с БД
 def delete_manga_from_bd(user_id, id):
-    if db.is_user_have_manga_by_id(user_id, id):
+    manga = db.get_manga_by_id(user_id, id)
+    if bool(len(manga)):
         db.delete_manga(user_id=user_id, id=id)
-        return MESSAGES['sucsessfully_deleted'].format(id)
+        return MESSAGES['sucsessfully_deleted'].format(manga[-1])
     else:
         return MESSAGES['dont_have_such_manga'].format(id)
 

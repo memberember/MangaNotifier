@@ -26,4 +26,4 @@ class MangaPage:
 
     # полчить название
     def get_name(self):
-        return self.pageTree.xpath(self.locator.name)[0].text
+        return re.sub(chapter_normalize_re, "", self.pageTree.xpath(self.locator.name)[0].text)

@@ -12,6 +12,7 @@ def from_manga_list_dict_to_manga_str(manga_dict):
 
 
 def from_short_updated_manga_list_to_str(updates):
+    # todo сделать выдачу ошибки
     buffer = ''
     message = ['Нет обновлений']
     if len(updates) > 0:
@@ -23,7 +24,6 @@ def from_short_updated_manga_list_to_str(updates):
                                                     update['url'])
 
             if len(buffer) > 2000:
-                print(buffer)
                 message.append(buffer)
                 buffer = ""
     if len(buffer) > 0:
@@ -43,11 +43,3 @@ def text_to_splitted(text):
         third_step += step.split(',')
 
     return third_step
-
-
-def text_to_date_and_chapter_url_dict(text, url):
-    chapter_date = re.search(P.chapter_date_re, text)[0]
-    return {
-        'url': url,
-        'date': chapter_date
-    }
