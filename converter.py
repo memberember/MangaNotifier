@@ -1,7 +1,3 @@
-import re
-import pages.locators as P
-
-
 def from_manga_list_dict_to_manga_str(manga_dict):
     manga_list_string = ''
     for manga in manga_dict:

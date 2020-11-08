@@ -6,9 +6,10 @@ from aiogram import Bot, Dispatcher, executor, types
 import config
 import logging
 from utils import BotStates
-from messages import MESSAGES
+from messages import Messages
 import converter as CV
 import parseRequests as PR
+import keyboards as kb
 
 # задаем уровень логов
 logging.basicConfig(level=logging.INFO)
@@ -27,46 +28,47 @@ db = SQLighter('dborig.db')
 # обработчик команды старта
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
-    await message.reply(MESSAGES['start'])
+    await message.answer(Messages.welcome)
+    await message.answer("Посылаю кнопки", reply_markup=kb.main_markup)
 
 
 # обработчик команды помощи
 @dp.message_handler(commands=['help'])
 async def process_help_command(message: types.Message):
-    await message.reply(MESSAGES['help'])
+    await message.reply(Messages.commands, reply_markup=kb.main_markup)
 
 
 # обработчик команды добавления манги
 @dp.message_handler(commands=['add'])
 async def process_add_url(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.answer(MESSAGES['write_url'])
+    await message.answer(Messages.write_url, reply_markup=kb.undo_addition_markup)
     await state.set_state(BotStates.all()[0])
 
 
 # обработчик команды вывода списка моих тайтлов
 @dp.message_handler(commands=['getsubscribed'])
-async def get_subcribed(message: types.Message):
+async def process_get_subcribed(message: types.Message):
     try:
         manga_list = get_manga_list_from_db(message.from_user.id)
         await message.answer(CV.from_manga_list_dict_to_manga_str(manga_dict=manga_list))
     except:
-        await message.answer(MESSAGES['empty_manga_list'])
+        await message.answer(Messages.empty_manga_list)
 
 
 # обработчик команды обновления
 @dp.message_handler(state='*', commands=['refresh'])
-async def refresh(message: types.Message):
+async def process_refresh(message: types.Message):
     global global_manga_list
     argument = message.get_args()
     start_time = time.time()
 
     # турбо поиск по команде /refresh t
-    if argument.lower() == 't' or message.from_user.id == ADMIN_USER_ID:
-        await message.answer(MESSAGES['fast_search_is_started'])
+    if argument.__str__().lower() == 't' or message.from_user.id == ADMIN_USER_ID:
+        await message.answer(Messages.fast_search_is_started)
         updates = get_fast_updates(message.from_user.id)
     else:
-        await message.answer(MESSAGES['search_is_started'])
+        await message.answer(Messages.search_is_started)
         updates = get_updates(message.from_user.id)
     for update in updates:
         await message.answer(update)
@@ -75,9 +77,9 @@ async def refresh(message: types.Message):
 
 # обработчик команды удаления тайтла
 @dp.message_handler(commands=['delete'])
-async def refresh(message: types.Message):
+async def proc_delete(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
-    await message.answer(MESSAGES['write_manga_id_to_delete'])
+    await message.answer(Messages.write_manga_id_to_delete, reply_markup=kb.undo_delition_markup)
     await state.set_state(BotStates.all()[1])
 
 
@@ -89,20 +91,20 @@ async def manga_addition_handler(message: types.Message):
     try:
 
         # если пользователь не отменил ввод, то начинаем поиск
-        if message.text != '/cancel':
+        if message.text != '/cancel' and message.text != Messages.undo_accept:
             url_list = CV.text_to_splitted(message.text)
             for url in url_list:
                 answer = add_manga(message.from_user.id, url)
-                await message.answer(answer)
+                await message.answer(answer, reply_markup=kb.main_markup)
         else:
             # посылаем сообщение об отмене
-            await message.answer(MESSAGES['canceled'])
+            await message.answer(Messages.canceled, reply_markup=kb.main_markup)
             # сброс состояния
         await state.reset_state()
 
         # сообщение об ошибке
     except:
-        await message.answer(MESSAGES['error_try_again'])
+        await message.answer(Messages.error_try_again)
 
 
 # обработчик удаления манги
@@ -113,21 +115,34 @@ async def manga_delete_handler(message: types.Message):
     try:
 
         # проверка на отмену команды
-        if message.text != '/cancel':
+        if message.text != '/cancel' and message.text != Messages.undo_delete:
             id_list = CV.text_to_splitted(message.text)
             for id in id_list:
                 answer = delete_manga_from_bd(message.from_user.id, id)
-                await message.answer(answer)
+                await message.answer(answer, reply_markup=kb.main_markup)
         else:
-            await message.answer(MESSAGES['canceled'])
+            await message.answer(Messages.canceled, reply_markup=kb.main_markup)
+
         await state.reset_state()
     except:
-        await message.answer(MESSAGES['error_try_again'])
+        await message.answer(Messages.error_try_again)
 
 
+# обработчик сообщений с кнопок
 @dp.message_handler()
-async def echo_message(msg: types.Message):
-    await bot.send_message(msg.from_user.id, msg.text)
+async def echo_message(message: types.Message):
+    if message.text == Messages.add:
+        await process_add_url(message)
+    elif message.text == Messages.delete:
+        await proc_delete(message)
+    elif message.text == Messages.get_subscribed_list:
+        await process_get_subcribed(message)
+    elif message.text == Messages.refresh:
+        await process_refresh(message)
+    elif message.text == Messages.commands:
+        await message.answer(Messages.my_commands)
+    else:
+        await bot.send_message(message.from_user.id, message.text, reply_markup=kb.main_markup)
 
 
 async def shutdown(dispatcher: Dispatcher):
@@ -152,9 +167,9 @@ def add_manga(user_id, url):
                 last_chapter=manga['last_chapter'],
                 name=manga['manga_name'],
             )
-            return MESSAGES['manga_sucsesfully_added'].format(manga['manga_name'])
-        return MESSAGES['data_error'].format(url)
-    return MESSAGES['you_already_have_this_manga'].format(url)
+            return Messages.manga_sucsesfully_added.format(manga['manga_name'])
+        return Messages.data_error.format(url)
+    return Messages.you_already_have_this_manga.format(url)
 
 
 # функция удаления манги с БД
@@ -162,9 +177,9 @@ def delete_manga_from_bd(user_id, id):
     manga = db.get_manga_by_id(user_id, id)
     if bool(len(manga)):
         db.delete_manga(user_id=user_id, id=id)
-        return MESSAGES['sucsessfully_deleted'].format(manga[-1])
+        return Messages.sucsessfully_deleted.format(manga[-1])
     else:
-        return MESSAGES['dont_have_such_manga'].format(id)
+        return Messages.dont_have_such_manga.format(id)
 
 
 # команда получения списка манги из БД
@@ -247,7 +262,6 @@ def processing():
 
 # запускаем лонг поллинг
 if __name__ == '__main__':
-    # dp.loop.create_task(scheduled(10))  # пока что оставим 10 секунд (в качестве теста)
     lock = threading.Lock()
     thread_list = []
     global_manga_list = []
