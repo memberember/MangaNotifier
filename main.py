@@ -29,7 +29,7 @@ db = SQLighter('dborig.db')
 @dp.message_handler(commands=['start'])
 async def process_start_command(message: types.Message):
     await message.answer(Messages.welcome)
-    await message.answer("Посылаю кнопки", reply_markup=kb.main_markup)
+    await message.answer(Messages.send_btns, reply_markup=kb.main_markup)
 
 
 # обработчик команды помощи
@@ -70,9 +70,9 @@ async def process_refresh(message: types.Message):
     else:
         await message.answer(Messages.search_is_started)
         updates = get_updates(message.from_user.id)
-    for update in updates:
-        await message.answer(update)
-    await message.answer("\nПоиск занял %s секунд" % (time.time() - start_time))
+    msg = CV.from_updates_to_inline_btns(updates)
+    await message.answer(msg['msg'], reply_markup=msg['kb'])
+    await message.answer(Messages.search_time_is % (time.time() - start_time))
 
 
 # обработчик команды удаления тайтла
@@ -211,7 +211,7 @@ def get_updates(user_id):
 
     updates = PR.get_manga_list_last_chapters(list_from_db)
     update_db(user_id, updates)
-    return CV.from_short_updated_manga_list_to_str(updates)
+    return updates
 
 
 # турбо обновления
@@ -234,7 +234,7 @@ def get_fast_updates(user_id):
     while len(thread_list) > 0:
         time.sleep(1)
     update_db(user_id, data)
-    return CV.from_short_updated_manga_list_to_str(data)
+    return data
 
 
 # функция турбо поиска обновлений

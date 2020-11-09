@@ -1,5 +1,5 @@
 from messages import Messages
-from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
+from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 btn_add = KeyboardButton(Messages.add)
 btn_delete = KeyboardButton(Messages.delete)
