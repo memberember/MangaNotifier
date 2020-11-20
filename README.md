@@ -12,6 +12,10 @@ Sites that are supported:
 
 * manhwatop.com
 
+* niadd.com
+
+* mangareader.net
+
 ### Important information
 
 To start the bot, you need to create a config.py file in root directory with the following fields
