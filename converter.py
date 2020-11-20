@@ -1,13 +1,13 @@
 from messages import Messages
 import keyboards as kb
 
-def from_manga_list_dict_to_manga_str(manga_dict):
-    manga_list_string = ''
+
+def from_manga_list_dict_to_btn(manga_dict):
+    inline_kb = kb.InlineKeyboardMarkup()
     for manga in manga_dict:
-        manga_list_string += '[{}] {} {}\n'.format(manga['id']
-                                                   , manga['manga_name']
-                                                   , manga['last_chapter'])
-    return manga_list_string
+        buffer = '[{}] {} {}\n'.format(manga['id'], manga['manga_name'], manga['last_chapter'])
+        inline_kb.add(kb.InlineKeyboardButton(buffer, url=manga['url']))
+    return inline_kb
 
 
 def from_short_updated_manga_list_to_str(updates):
@@ -30,7 +30,7 @@ def from_short_updated_manga_list_to_str(updates):
     return message
 
 
-def text_to_splitted(text):
+def text_to_split(text):
     first_step = text.split('\n')
     second_step = []
     third_step = []
@@ -45,7 +45,7 @@ def text_to_splitted(text):
 
 
 # конвертер глав в кнопки
-def from_updates_to_inline_btns(updates):
+def from_updates_to_inline_btn(updates):
     inline_kb = kb.InlineKeyboardMarkup()
     if len(updates) > 0:
         for update in updates:
@@ -56,4 +56,4 @@ def from_updates_to_inline_btns(updates):
         return {'msg': Messages.new_chapters_already,
                 'kb': inline_kb}
     return {'msg': Messages.updates_not_found,
-                'kb': kb.main_markup}
+            'kb': kb.main_markup}

@@ -10,6 +10,7 @@ class MangaPage:
         self.locator = get_locator(url)
         self.pageTree = ''
 
+    # todo сделать разрыв соединения если запрос дольше 2 секунд
     # открыть страницу
     def open(self):
         headers = {

@@ -51,7 +51,7 @@ async def process_add_url(message: types.Message):
 async def process_get_subcribed(message: types.Message):
     try:
         manga_list = get_manga_list_from_db(message.from_user.id)
-        await message.answer(CV.from_manga_list_dict_to_manga_str(manga_dict=manga_list))
+        await message.answer(Messages.your_manga_list, reply_markup=CV.from_manga_list_dict_to_btn(manga_list))
     except:
         await message.answer(Messages.empty_manga_list)
 
@@ -70,7 +70,7 @@ async def process_refresh(message: types.Message):
     else:
         await message.answer(Messages.search_is_started)
         updates = get_updates(message.from_user.id)
-    msg = CV.from_updates_to_inline_btns(updates)
+    msg = CV.from_updates_to_inline_btn(updates)
     await message.answer(msg['msg'], reply_markup=msg['kb'])
     await message.answer(Messages.search_time_is % (time.time() - start_time))
 
@@ -92,7 +92,7 @@ async def manga_addition_handler(message: types.Message):
 
         # если пользователь не отменил ввод, то начинаем поиск
         if message.text != '/cancel' and message.text != Messages.undo_accept:
-            url_list = CV.text_to_splitted(message.text)
+            url_list = CV.text_to_split(message.text)
             for url in url_list:
                 answer = add_manga(message.from_user.id, url)
                 await message.answer(answer, reply_markup=kb.main_markup)
@@ -116,7 +116,7 @@ async def manga_delete_handler(message: types.Message):
 
         # проверка на отмену команды
         if message.text != '/cancel' and message.text != Messages.undo_delete:
-            id_list = CV.text_to_splitted(message.text)
+            id_list = CV.text_to_split(message.text)
             for id in id_list:
                 answer = delete_manga_from_bd(message.from_user.id, id)
                 await message.answer(answer, reply_markup=kb.main_markup)

@@ -4,6 +4,7 @@ chapter_number_re = '((?:\d){1,3}\s?-?\s?(?:\d){1,4})'
 chapter_normalize_re = r"\t|(\s\s)|\n"
 
 
+# todo переделать в базу данных
 class Pattern:
     def __init__(self,
                  url_container,
@@ -38,7 +39,19 @@ ManhwaTop = Pattern(
     name='//div[1]/div/ol/li[3]/a',
 )
 
-locatorsArray = [ReadManga, MintManga, MangaChan, ManhwaTop]
+MangaReader = Pattern(
+    url_container='mangareader',
+    last_chapter='//*[@id="main"]/div[3]//div[2]//li[1]/a',
+    name='//*[@class="name"]',
+)
+
+Niadd = Pattern(
+    url_container='niadd',
+    last_chapter='//div[4]//a/div/div[2]',
+    name='//*[@class="book-headline-name"]',
+)
+
+locatorsArray = [ReadManga, MintManga, MangaChan, ManhwaTop, MangaReader, Niadd]
 
 
 def get_locator(url):
