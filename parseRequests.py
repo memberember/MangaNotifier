@@ -1,9 +1,10 @@
 from pages.mangaPage import MangaPage
+from time import sleep
 
 
 # функция получения информации по манге
 def get_manga(url):
-
+    sleep(0.2)
     try:
         page = MangaPage(url)
         page.open()

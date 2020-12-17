@@ -51,9 +51,16 @@ async def process_add_url(message: types.Message):
 async def process_get_subcribed(message: types.Message):
     try:
         manga_list = get_manga_list_from_db(message.from_user.id)
-        await message.answer(Messages.your_manga_list, reply_markup=CV.from_manga_list_dict_to_btn(manga_list))
+
+        # преобразование списка в кнопки
+        answers = CV.from_manga_list_dict_to_btn(manga_list)
+
+        # список из ответов
+        for answer in answers:
+            await message.answer(answer['msg'], reply_markup=answer['kb'])
     except:
         await message.answer(Messages.empty_manga_list)
+
 
 
 # обработчик команды обновления

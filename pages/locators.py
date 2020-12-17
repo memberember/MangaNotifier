@@ -41,7 +41,7 @@ ManhwaTop = Pattern(
 
 MangaReader = Pattern(
     url_container='mangareader',
-    last_chapter='//*[@id="main"]/div[3]//div[2]//li[1]/a',
+    last_chapter='//*[@id="main"]/div[3]//div[2]/ul/li[1]/a',
     name='//*[@class="name"]',
 )
 

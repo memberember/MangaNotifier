@@ -4,10 +4,36 @@ import keyboards as kb
 
 def from_manga_list_dict_to_btn(manga_dict):
     inline_kb = kb.InlineKeyboardMarkup()
+    answer = []
+    iter = 0
+
     for manga in manga_dict:
         buffer = '[{}] {} {}\n'.format(manga['id'], manga['manga_name'], manga['last_chapter'])
         inline_kb.add(kb.InlineKeyboardButton(buffer, url=manga['url']))
-    return inline_kb
+        iter += 1
+
+        # если слишком много глав, то обрезаем сообщение
+        if iter >= 32:
+            temp_mes = Messages.your_manga_list_continue
+
+            # если сообщений нет, то это становится первым
+            if len(answer) < 1:
+                temp_mes = Messages.your_manga_list
+
+            # добавляем в ответ словарь в виде нашего сообщения
+            answer.append({'msg': temp_mes,
+                           'kb': inline_kb
+                           })
+
+            # обнуляем переменные
+            inline_kb = kb.InlineKeyboardMarkup()
+            iter = 0
+
+    if iter != 0:
+        answer.append({'msg': Messages.your_manga_list_continue,
+                       'kb': inline_kb
+                       })
+    return answer
 
 
 def from_short_updated_manga_list_to_str(updates):
