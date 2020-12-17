@@ -62,7 +62,6 @@ async def process_get_subcribed(message: types.Message):
         await message.answer(Messages.empty_manga_list)
 
 
-
 # обработчик команды обновления
 @dp.message_handler(state='*', commands=['refresh'])
 async def process_refresh(message: types.Message):
