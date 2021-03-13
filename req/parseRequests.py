@@ -1,16 +1,15 @@
 from pages.mangaPage import MangaPage
-from time import sleep
 
 
 # функция получения информации по манге
 def get_manga(url):
-    sleep(0.2)
     try:
         page = MangaPage(url)
         page.open()
-
-        return {'manga_name': page.get_name(),
-                'last_chapter': page.get_last_chapter()
+        name = page.get_name()
+        last_chapter = page.get_last_chapter()
+        return {'name': name,
+                'last_chapter': last_chapter
                 }
 
     except Exception as e:
@@ -33,7 +32,7 @@ def get_manga_list_last_chapters(manga_list):
             # если последняя глава манги
             if current['last_chapter'] != from_site['last_chapter']:
                 updates.append({
-                    'manga_name': from_site['manga_name'],
+                    'name': from_site['name'],
                     'last_chapter': from_site['last_chapter'],
                     'id': current['id'],
                     'url': current['url'],
@@ -53,7 +52,7 @@ def get_manga_updates_turbo(current):
         # если последняя глава манги
         if current['last_chapter'] != from_site['last_chapter']:
             return {
-                'manga_name': from_site['manga_name'],
+                'name': from_site['name'],
                 'last_chapter': from_site['last_chapter'],
                 'id': current['id'],
                 'url': current['url'],

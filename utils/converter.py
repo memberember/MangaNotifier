@@ -1,5 +1,5 @@
-from messages import Messages
-import keyboards as kb
+from resourses.messages import Messages
+from utils import keyboards as kb
 
 
 def from_manga_list_dict_to_btn(manga_dict):
@@ -8,7 +8,7 @@ def from_manga_list_dict_to_btn(manga_dict):
     iter = 0
 
     for manga in manga_dict:
-        buffer = '[{}] {} {}\n'.format(manga['id'], manga['manga_name'], manga['last_chapter'])
+        buffer = '{} {}\n'.format( manga['name'], manga['last_chapter'])
         inline_kb.add(kb.InlineKeyboardButton(buffer, url=manga['url']))
         iter += 1
 
@@ -43,7 +43,7 @@ def from_short_updated_manga_list_to_str(updates):
     if len(updates) > 0:
         message[0] = Messages.new_chapters_already
         for update in updates:
-            buffer += '{} {}\t->\t{} \t{}\n'.format(update['manga_name'],
+            buffer += '{} {}\t->\t{} \t{}\n'.format(update['name'],
                                                     update['prev_chapter'],
                                                     update['last_chapter'],
                                                     update['url'])
@@ -77,7 +77,7 @@ def from_updates_to_inline_btn(updates):
         for update in updates:
             buffer = '{}\t->\t{} {}'.format(update['prev_chapter'],
                                             update['last_chapter'],
-                                            update['manga_name'])
+                                            update['name'])
             inline_kb.add(kb.InlineKeyboardButton(buffer, url=update['url']))
         return {'msg': Messages.new_chapters_already,
                 'kb': inline_kb}

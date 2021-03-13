@@ -1,4 +1,4 @@
-from messages import Messages
+from resourses.messages import Messages
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, InlineKeyboardMarkup, InlineKeyboardButton
 
 btn_add = KeyboardButton(Messages.add)

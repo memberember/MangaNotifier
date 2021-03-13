@@ -19,10 +19,18 @@ class SQLighter:
                 (user_id, url, last_chapter, name))
 
     def get_manga(self, user_id):
+        manga_list = []
         """Проверяем мангу пользователя"""
         with self.connection:
             result = self.cursor.execute("SELECT * FROM `manga_title` WHERE `user_id` = ?", (user_id,)).fetchall()
-            return result
+            for title in result:
+                manga_list.append({
+                    'id': title[0],
+                    'name': title[4],
+                    'last_chapter': title[3],
+                    'url': title[2]
+                })
+            return manga_list
 
     def update_manga(self, user_id, id, last_chapter):
         """Обновляем статус подписки пользователя"""

@@ -35,7 +35,7 @@ MangaChan = Pattern(
 
 ManhwaTop = Pattern(
     url_container='manhwatop',
-    last_chapter='//div/div[4]/div/ul/li[1]/a',
+    last_chapter='//*/div[2]/div/ul/li[*]',
     name='//div[1]/div/ol/li[3]/a',
 )
 

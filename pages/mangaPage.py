@@ -22,9 +22,14 @@ class MangaPage:
 
     # получить последнюю главу
     def get_last_chapter(self):
-        last_chapter = self.pageTree.xpath(self.locator.last_chapter)[0].text
-        return re.search(chapter_number_re, last_chapter)[0]
+
+        last_chapters = self.pageTree.xpath(self.locator.last_chapter)
+        last_chapter = last_chapters[0].text
+        result = re.search(chapter_number_re, last_chapter)[0]
+        return result
 
     # полчить название
     def get_name(self):
-        return re.sub(chapter_normalize_re, "", self.pageTree.xpath(self.locator.name)[0].text)
+        name = self.pageTree.xpath(self.locator.name)[0].text
+        result = re.sub(chapter_normalize_re, "", name)
+        return result

@@ -1,28 +1,35 @@
-import threading
-from sqlighter import SQLighter
-import time
-from aiogram.contrib.fsm_storage.memory import MemoryStorage
-from aiogram import Bot, Dispatcher, executor, types
-import config
 import logging
-from utils import BotStates
-from messages import Messages
-import converter as CV
-import parseRequests as PR
-import keyboards as kb
+import threading
+import time
+
+from aiogram import Bot, Dispatcher, executor, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+
+from resourses import config
+from req import parseRequests as PR
+from resourses.messages import Messages
+from dao.sqlighter import SQLighter
+from dao.firebaser import FireBaser
+from utils import converter as CV, keyboards as kb
+from utils.utils import BotStates
 
 # задаем уровень логов
 logging.basicConfig(level=logging.INFO)
 
 # инициализируем бота
-bot = Bot(token=config.MANGA_API_TOKEN)
+bot = Bot(token=config.TEST_API_TOKEN)
 ADMIN_USER_ID = config.ADMIN_USER_ID
 
 dp = Dispatcher(bot, storage=MemoryStorage())
 
 # todo попробовать сделать бд на сервере
 # инициализируем соединение с БД
-db = SQLighter('dborig.db')
+
+'''Локальная на SQL'''
+# db = SQLighter('resourses/dborig.db')
+
+'''Глобальная на Firebase'''
+db = FireBaser(firebase_config=config.firebaseConfig)
 
 
 # обработчик команды старта
@@ -48,13 +55,12 @@ async def process_add_url(message: types.Message):
 
 # обработчик команды вывода списка моих тайтлов
 @dp.message_handler(commands=['getsubscribed'])
-async def process_get_subcribed(message: types.Message):
+async def process_get_subscribed(message: types.Message):
     try:
         manga_list = get_manga_list_from_db(message.from_user.id)
 
         # преобразование списка в кнопки
         answers = CV.from_manga_list_dict_to_btn(manga_list)
-
         # список из ответов
         for answer in answers:
             await message.answer(answer['msg'], reply_markup=answer['kb'])
@@ -82,6 +88,7 @@ async def process_refresh(message: types.Message):
 
 
 # обработчик команды удаления тайтла
+# todo пересмотреть удаление через кнопки
 @dp.message_handler(commands=['delete'])
 async def proc_delete(message: types.Message):
     state = dp.current_state(user=message.from_user.id)
@@ -142,7 +149,7 @@ async def echo_message(message: types.Message):
     elif message.text == Messages.delete:
         await proc_delete(message)
     elif message.text == Messages.get_subscribed_list:
-        await process_get_subcribed(message)
+        await process_get_subscribed(message)
     elif message.text == Messages.refresh:
         await process_refresh(message)
     elif message.text == Messages.commands:
@@ -171,9 +178,9 @@ def add_manga(user_id, url):
                 user_id=user_id,
                 url=url,
                 last_chapter=manga['last_chapter'],
-                name=manga['manga_name'],
+                name=manga['name'],
             )
-            return Messages.manga_sucsesfully_added.format(manga['manga_name'])
+            return Messages.manga_sucsesfully_added.format(manga['name'])
         return Messages.data_error.format(url)
     return Messages.you_already_have_this_manga.format(url)
 
@@ -191,15 +198,7 @@ def delete_manga_from_bd(user_id, id):
 # команда получения списка манги из БД
 def get_manga_list_from_db(user_id):
     manga = db.get_manga(user_id)
-    manga_list = []
-    for title in manga:
-        manga_list.append({
-            'id': title[0],
-            'manga_name': title[4],
-            'last_chapter': title[3],
-            'url': title[2]
-        })
-    return manga_list
+    return manga
 
 
 # функция обновления базы данных на новые данные
@@ -214,7 +213,6 @@ def update_db(user_id, manga_list):
 # короткие обновления
 def get_updates(user_id):
     list_from_db = get_manga_list_from_db(user_id)
-
     updates = PR.get_manga_list_last_chapters(list_from_db)
     update_db(user_id, updates)
     return updates
@@ -222,6 +220,7 @@ def get_updates(user_id):
 
 # турбо обновления
 def get_fast_updates(user_id):
+
     # объявление глобальных переменных
     global global_manga_list
     global thread_list
@@ -256,7 +255,7 @@ def processing():
         if s != 0:
             with lock:
                 data.append({
-                    'manga_name': s["manga_name"],
+                    'name': s["name"],
                     'last_chapter': s["last_chapter"],
                     'id': manga['id'],
                     'url': manga['url'],
@@ -273,3 +272,6 @@ if __name__ == '__main__':
     global_manga_list = []
     data = []
     executor.start_polling(dp, on_shutdown=shutdown)
+
+
+
