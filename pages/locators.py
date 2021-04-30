@@ -17,13 +17,13 @@ class Pattern:
 
 ReadManga = Pattern(
     url_container='readmanga',
-    last_chapter='//*[@id="mangaBox"]/div[2]/div[1]/div[1]/div[*]/h4/a',
+    last_chapter='//*[@id="mangaBox"]/div[2]/div[1]/div[1]/div[*]//h4/a',
     name='//div[2]/h1/span[1]',
 )
 
 MintManga = Pattern(
     url_container='mintmanga',
-    last_chapter='//*[@id="mangaBox"]/div[2]/div[1]/div[1]/div[*]/h4/a',
+    last_chapter='//*[@id="mangaBox"]/div[2]/div[1]/div[1]/div[*]//h4/a',
     name='//div[2]/h1/span[1]',
 )
 
@@ -35,7 +35,7 @@ MangaChan = Pattern(
 
 ManhwaTop = Pattern(
     url_container='manhwatop',
-    last_chapter='//*/div[2]/div/ul/li[*]',
+    last_chapter='//div[2]/div/ul/li[1]/a',
     name='//div[1]/div/ol/li[3]/a',
 )
 
