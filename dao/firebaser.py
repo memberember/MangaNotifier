@@ -33,7 +33,8 @@ class FireBaser:
             manga_with_id = manga.val()
             manga_with_id['id'] = manga.key()
             buf.append(manga_with_id)
-        return buf
+        sorted_list = sorted(buf, key=lambda k: k['name'])
+        return sorted_list
 
     # todo оптимизировать под обновление списком
     def update_manga(self, user_id, id, last_chapter):
