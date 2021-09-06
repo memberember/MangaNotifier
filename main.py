@@ -272,6 +272,3 @@ if __name__ == '__main__':
     global_manga_list = []
     data = []
     executor.start_polling(dp, on_shutdown=shutdown)
-
-
-
